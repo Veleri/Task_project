@@ -168,7 +168,7 @@ public class ShoppingCart {
         if(type.equals(ItemType.SALE)){
             discount = 70;
         }
-        if(type.equals(ItemType.NEW) &&  quantity >= 10 ){
+        if(!type.equals(ItemType.NEW) &&  quantity >= 10 ){
             discount += quantity / 10;
             if(discount > 80){
                 discount = 80;
