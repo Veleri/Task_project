@@ -33,18 +33,12 @@ public class ShoppingCart {
      * @throws IllegalArgumentException if some value is wrong
      */
     public void addItem(String title, double price, int quantity, ItemType type) {
-        if (title == null || title.length() == 0 || title.length() > 32)
-            throw new IllegalArgumentException("Illegal title");
-        if (price < 0.01)
-            throw new IllegalArgumentException("Illegal price");
-        if (quantity <= 0)
-            throw new IllegalArgumentException("Illegal quantity");
-        Item item = new Item();
-        item.title = title;
-        item.price = price;
-        item.quantity = quantity;
-        item.type = type;
-        items.add(item);
+        Item newItem  = new Item();
+        newItem.setPrice(price);
+        newItem.setTitle(title);
+        newItem.setQuantity(quantity);
+        newItem.setItemType(type);
+        items.add(newItem);
     }
 
     /**
