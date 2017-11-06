@@ -162,25 +162,18 @@ public class ShoppingCart {
      */
     public static int calculateDiscount(ItemType type, int quantity) {
         int discount = 0;
-        switch (type) {
-            case NEW:
-                return 0;
-            case REGULAR:
-                discount = 0;
-                break;
-            case SECOND_FREE:
-                if (quantity > 1)
-                    discount = 50;
-                break;
-            case SALE:
-                discount = 70;
-                break;
+        if(type.equals(ItemType.SECOND_FREE) && quantity > 1){
+            discount = 50;
         }
-        if (discount < 80) {
+        if(type.equals(ItemType.SALE)){
+            discount = 70;
+        }
+        if(type.equals(ItemType.NEW) &&  quantity >= 10 ){
             discount += quantity / 10;
-            if (discount > 80)
+            if(discount > 80){
                 discount = 80;
+            }
         }
-        return discount;
+        return  discount;
     }
 }
