@@ -9,6 +9,19 @@ public class ShoppingCart {
      * Container for added items
      */
     private List<Item> items = new ArrayList<Item>();
+    private List<String[]> lines = new ArrayList<String[]>();
+    private String[] header = {"#", "Item", "Price", "Quan.", "Discount", "Total"};
+    private String[] footer;
+    private int[] align = new int[]{1, -1, 1, 1, 1, 1};
+    private int[] width = new int[]{0, 0, 0, 0, 0, 0};
+    private int lineSize;
+    private static final NumberFormat MONEY;
+
+    static {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setDecimalSeparator('.');
+        MONEY = new DecimalFormat("$#.00", symbols);
+    }
 
     /**
      * Tests all class methods.
@@ -40,6 +53,7 @@ public class ShoppingCart {
         newItem.setItemType(type);
         items.add(newItem);
     }
+
 
     /**
      * Formats shopping price.
@@ -122,14 +136,6 @@ public class ShoppingCart {
         return sb.toString();
     }
 
-    // --- private section -----------------------------------------------------
-    private static final NumberFormat MONEY;
-
-    static {
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
-        symbols.setDecimalSeparator('.');
-        MONEY = new DecimalFormat("$#.00", symbols);
-    }
 
     /**
      * Appends to sb formatted value.
