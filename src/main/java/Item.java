@@ -19,6 +19,7 @@ public class Item {
         setPrice(price);
         setQuantity(quantity);
     }
+    public Item(){}
     /**
      * Method that get title of Item
      * @return title of Item
