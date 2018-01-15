@@ -1,3 +1,4 @@
+package java;
 /**
  * Class describes enum "ItemType"
  *

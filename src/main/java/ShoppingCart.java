@@ -1,3 +1,4 @@
+package java;
 import java.util.*;
 import java.text.*;
 /**
@@ -55,7 +56,7 @@ public class ShoppingCart {
     }
 
     /**
-     *
+     * Method, that add separator.
      * @param sb - StringBuilder
      * @param lineLength - size of lines
      */
@@ -64,6 +65,7 @@ public class ShoppingCart {
             sb.append("-");
         sb.append("\n");
     }
+
     /**
      * Method, that prepare lines.
      */

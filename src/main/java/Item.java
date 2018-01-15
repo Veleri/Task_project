@@ -1,3 +1,4 @@
+package java;
 /**
  * Class describes essence "Item"
  *
@@ -12,6 +13,12 @@ public class Item {
     private int quantity;
     private ItemType itemType;
 
+    public Item (String title, ItemType type, double price, int quantity){
+        setTitle(title);
+        setItemType(type);
+        setPrice(price);
+        setQuantity(quantity);
+    }
     /**
      * Method that get title of Item
      * @return title of Item
