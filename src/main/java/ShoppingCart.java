@@ -54,7 +54,92 @@ public class ShoppingCart {
         items.add(newItem);
     }
 
+    /**
+     *
+     * @param sb - StringBuilder
+     * @param lineLength - size of lines
+     */
+    private static void addSeparator(StringBuilder sb, int lineLength) {
+        for (int i = 0; i < lineLength; i++)
+            sb.append("-");
+        sb.append("\n");
+    }
+    /**
+     * Method, that prepare lines.
+     */
+    private void prepareLines() {
+        double total = 0.00;
+        int index = 0;
+        for (Item item : items) {
+            int discount = ItemType.calculateDiscount(item.getItemType(),item.getQuantity());
+            double itemTotal = item.getPrice() * item.getQuantity() * (100.00 - discount) / 100.00;
+            this.lines.add(new String[]{
+                    String.valueOf(++index),
+                    item.getTitle(),
+                    MONEY.format(item.getPrice()),
+                    String.valueOf(item.getQuantity()),
+                    (discount == 0) ? "-" : (String.valueOf(discount) + "%"),
+                    MONEY.format(itemTotal)
+            });
+            total += itemTotal;
+        }
+        footer = new String[]{String.valueOf(index), "", "", "", "", MONEY.format(total)};
+    }
 
+    /**
+     * Method, that format lines of StringBuilder.
+     * @param sb - StringBuilder
+     */
+    private void formatLines(StringBuilder sb) {
+        for (String[] line : lines) {
+            for (int i = 0; i < line.length; i++)
+                appendFormatted(sb, line[i], align[i], width[i]);
+            sb.append("\n");
+        }
+    }
+
+    /**
+     * Method, that format footer of StringBuilder.
+     * @param sb - StringBuilder
+     */
+    private void formatFooter(StringBuilder sb) {
+        addSeparator(sb, lineSize);
+        for (int i = 0; i < footer.length; i++)
+            appendFormatted(sb, footer[i], align[i], width[i]);
+    }
+
+    /**
+     *Method, that count lines lengths.
+     */
+    private void countLineLength() {
+        lineSize = width.length - 1;
+        for (int w : width)
+            lineSize += w;
+    }
+
+    /**
+     * Method, that format header of StringBuilder
+     * @param sb - StringBuilder
+     */
+    private void formatHeader(StringBuilder sb) {
+        for (int i = 0; i < header.length; i++)
+            appendFormatted(sb, header[i], align[i], width[i]);
+        sb.append("\n");
+        addSeparator(sb, lineSize);
+    }
+
+    /**
+     * Method, that count columns lengths.
+     */
+    private void countColumnLengths() {
+        for (String[] line : lines)
+            for (int i = 0; i < line.length; i++)
+                width[i] = (int) Math.max(width[i], line[i].length());
+        for (int i = 0; i < header.length; i++)
+            width[i] = (int) Math.max(width[i], header[i].length());
+        for (int i = 0; i < footer.length; i++)
+            width[i] = (int) Math.max(width[i], footer[i].length());
+    }
     /**
      * Formats shopping price.
      *
@@ -74,68 +159,15 @@ public class ShoppingCart {
     public String formatTicket() {
         if (items.size() == 0)
             return "No items.";
-        List<String[]> lines = new ArrayList<String[]>();
-        String[] header = {"#", "Item", "Price", "Quan.", "Discount", "Total"};
-        int[] align = new int[]{1, -1, 1, 1, 1, 1};
-// formatting each line
-        double total = 0.00;
-        int index = 0;
-        for (Item item : items) {
-            int discount = calculateDiscount(item.type, item.quantity);
-            double itemTotal = item.price * item.quantity * (100.00 - discount) / 100.00;
-            lines.add(new String[]{
-                    String.valueOf(++index),
-                    item.title,
-                    MONEY.format(item.price),
-                    String.valueOf(item.quantity),
-                    (discount == 0) ? "-" : (String.valueOf(discount) + "%"),
-                    MONEY.format(itemTotal)
-            });
-            total += itemTotal;
-        }
-        String[] footer = {String.valueOf(index), "", "", "", "",
-                MONEY.format(total)};
-// formatting table
-// column max length
-        int[] width = new int[]{0, 0, 0, 0, 0, 0};
-        for (String[] line : lines)
-            for (int i = 0; i < line.length; i++)
-                width[i] = (int) Math.max(width[i], line[i].length());
-        for (int i = 0; i < header.length; i++)
-            width[i] = (int) Math.max(width[i], header[i].length());
-        for (int i = 0; i < footer.length; i++)
-            width[i] = (int) Math.max(width[i], footer[i].length());
-// line length
-        int lineLength = width.length - 1;
-        for (int w : width)
-            lineLength += w;
         StringBuilder sb = new StringBuilder();
-// header
-        for (int i = 0; i < header.length; i++)
-            appendFormatted(sb, header[i], align[i], width[i]);
-        sb.append("\n");
-// separator
-        for (int i = 0; i < lineLength; i++)
-            sb.append("-");
-        sb.append("\n");
-// lines
-        for (String[] line : lines) {
-            for (int i = 0; i < line.length; i++)
-                appendFormatted(sb, line[i], align[i], width[i]);
-            sb.append("\n");
-        }
-        if (lines.size() > 0) {
-// separator
-            for (int i = 0; i < lineLength; i++)
-                sb.append("-");
-            sb.append("\n");
-        }
-// footer
-        for (int i = 0; i < footer.length; i++)
-            appendFormatted(sb, footer[i], align[i], width[i]);
+        prepareLines();
+        countColumnLengths();
+        countLineLength();
+        formatHeader(sb);
+        formatLines(sb);
+        formatFooter(sb);
         return sb.toString();
     }
-
 
     /**
      * Appends to sb formatted value.
@@ -158,28 +190,4 @@ public class ShoppingCart {
         sb.append(" ");
     }
 
-    /**
-     * Calculates item's discount.
-     * For NEW item discount is 0%;
-     * For SECOND_FREE item discount is 50% if quantity > 1
-     * For SALE item discount is 70%
-     * For each full 10 not NEW items item gets additional 1% discount,
-     * but not more than 80% total
-     */
-    public static int calculateDiscount(ItemType type, int quantity) {
-        int discount = 0;
-        if(type.equals(ItemType.SECOND_FREE) && quantity > 1){
-            discount = 50;
-        }
-        if(type.equals(ItemType.SALE)){
-            discount = 70;
-        }
-        if(!type.equals(ItemType.NEW) &&  quantity >= 10 ){
-            discount += quantity / 10;
-            if(discount > 80){
-                discount = 80;
-            }
-        }
-        return  discount;
-    }
 }
